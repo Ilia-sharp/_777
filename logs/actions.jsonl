@@ -1,0 +1,5 @@
+{"time":"2026-10-09T18:53:20Z","state":[0.01,0.2,-0.03,-0.4],"action":0,"reward":null,"model_version":"ppo-cartpole-v1.0"}
+{"time":"2026-10-09T18:53:20Z","state":[0.0,-0.1,0.02,0.1],"action":1,"reward":1.0,"model_version":"ppo-cartpole-v1.0"}
+{"time":"2026-10-09T18:53:20Z","state":[-0.04,0.05,-0.01,-0.2],"action":0,"reward":1.0,"model_version":"ppo-cartpole-v1.0"}
+{"time":"2026-10-09T18:53:20Z","state":[0.08,0.3,0.04,-0.15],"action":1,"reward":0.0,"model_version":"ppo-cartpole-v1.0"}
+{"time":"2026-10-09T18:53:20Z","state":[-0.1,-0.25,0.06,0.2],"action":1,"reward":null,"model_version":"ppo-cartpole-v1.0"}

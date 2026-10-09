@@ -1,0 +1,5 @@
+fastapi==0.128.2
+uvicorn==0.48.0
+pydantic==2.13.5
+numpy==2.3.5
+gymnasium==1.3.0

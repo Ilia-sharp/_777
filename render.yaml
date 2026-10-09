@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: nazdratenko-cartpole-lr7
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt -r requirements-train.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: TRAIN_ENABLED
+        value: "false"
+      - key: TRAIN_MAX_TIMESTEPS
+        value: "50000"
+      - key: MODEL_VERSION
+        value: ppo-cartpole-v1.0

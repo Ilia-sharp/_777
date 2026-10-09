@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f7fb">
+  <meta name="description" content="Живая симуляция CartPole: наблюдайте за физикой, действиями PPO и наградой в реальном времени.">
+  <title>Nazdratenko — CartPole Lab</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="page-noise" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Nazdratenko — главная">
+      <span class="brand-icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M5 22h22M8 22l-2 4h20l-2-4M13 21V5m0 0 5 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="27" r="1.5" fill="currentColor"/><circle cx="22" cy="27" r="1.5" fill="currentColor"/><circle cx="13" cy="5" r="2" fill="#5e8df7"/></svg>
+      </span>
+      <span class="brand-name">Nazdratenko<span>.</span></span>
+      <span class="brand-divider"></span>
+      <span class="brand-product">AI LAB <span>07</span></span>
+    </a>
+    <div class="topbar-right">
+      <span class="environment-label"><span class="tiny-square"></span> CARTPOLE-V1</span>
+      <span class="top-divider"></span>
+      <div class="service-status" id="service-status" data-state="checking"><span class="status-dot"></span><span id="status-text">Проверяем сервис…</span></div>
+      <span class="version-label" id="model-version">ppo-cartpole-v1.0</span>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="intro-row">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-pip"></span> ЛАБОРАТОРНАЯ РАБОТА № 7 <span class="eyebrow-slash">/</span> ОБУЧЕНИЕ С ПОДКРЕПЛЕНИЕМ</div>
+        <h1>Не просто метрики. <span>Посмотри, как агент учится.</span></h1>
+        <p class="intro-subtitle">Запускай эпизод, меняй режим и наблюдай, как действие модели влияет на тележку и шест.</p>
+      </div>
+      <div class="intro-tag"><span class="live-ring"><i></i></span><span><b>LIVE SIMULATION</b><small>Физика · Действия · Награда</small></span></div>
+    </section>
+
+    <section class="workspace" aria-label="Панель симуляции CartPole">
+      <article class="stage-card">
+        <div class="stage-toolbar">
+          <div class="stage-title-group">
+            <span class="stage-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 18h18M6 18l1.5-3h9L18 18M12 15V4m0 0 4 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="4" r="1.5" fill="currentColor"/></svg></span>
+            <div><strong>Физическая среда</strong><small id="engine-label">Подключаем CartPole-v1…</small></div>
+          </div>
+          <div class="sim-live"><span class="live-dot" id="simulation-dot"></span><span id="simulation-state-label">ГОТОВО К ЗАПУСКУ</span></div>
+          <button class="icon-button" id="reset-button" type="button" title="Сбросить эпизод" aria-label="Сбросить эпизод"><svg viewBox="0 0 24 24" fill="none"><path d="M20 7v5h-5M4.8 9a7.5 7.5 0 0 1 12.6-2L20 12M4 17v-5h5m10.2 3a7.5 7.5 0 0 1-12.6 2L4 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+
+        <div class="simulation-viewport" id="simulation-viewport">
+          <canvas id="simulation-canvas" aria-label="Живая физическая симуляция тележки с балансирующим шестом"></canvas>
+          <div class="canvas-badge badge-left"><span class="badge-number">01</span><span><b>СИМУЛЯТОР</b><small id="seed-label">SEED 116</small></span></div>
+          <div class="canvas-badge badge-right"><span class="telemetry-pulse"></span><span><b id="physics-status">ФИЗИКА В РЕАЛЬНОМ ВРЕМЕНИ</b><small>20 ms / шаг среды</small></span></div>
+          <div class="canvas-tip" id="canvas-tip"><span class="tip-key">SPACE</span> чтобы запустить <span class="tip-separator">·</span> <span class="tip-key">R</span> сбросить</div>
+          <div class="terminal-state" id="terminal-state" hidden><span class="terminal-icon">Ⅱ</span><strong>Эпизод завершён</strong><small id="terminal-message">Сбрось среду, чтобы попробовать снова.</small><button id="terminal-reset" type="button">Новый эпизод <span>↗</span></button></div>
+        </div>
+
+        <div class="stage-foot">
+          <div class="score-main"><span class="metric-overline">НАГРАДА ЭПИЗОДА</span><div><strong id="episode-reward">0</strong><span>/ 500</span><span class="reward-live" id="reward-delta">+0 за шаг</span></div></div>
+          <div class="episode-progress"><div class="progress-meta"><span>Прогресс эпизода</span><b id="episode-progress-label">0%</b></div><div class="episode-track"><div class="episode-fill" id="episode-progress-fill"></div></div><div class="episode-track-labels"><span>0</span><span>250</span><span>500 шагов</span></div></div>
+          <div class="elapsed-main"><span class="metric-overline">ШАГ СРЕДЫ</span><strong id="step-counter">000</strong><small id="elapsed-label">Ожидание запуска</small></div>
+        </div>
+      </article>
+
+      <aside class="control-card">
+        <div class="sidebar-tabs" role="tablist" aria-label="Инструменты симуляции">
+          <button class="sidebar-tab is-active" type="button" role="tab" aria-selected="true" data-view="control">Управление</button>
+          <button class="sidebar-tab" type="button" role="tab" aria-selected="false" data-view="quality">Метрики</button>
+          <button class="sidebar-tab" type="button" role="tab" aria-selected="false" data-view="training">Обучение</button>
+        </div>
+
+        <section class="side-view is-active" id="panel-control" data-panel="control" role="tabpanel">
+          <div class="decision-head"><div><span class="metric-overline">ПОСЛЕДНЕЕ РЕШЕНИЕ АГЕНТА</span><span class="decision-caption" id="decision-caption">Ждём первый шаг</span></div><span class="decision-chip" id="decision-chip">PPO</span></div>
+          <div class="decision-display" id="decision-display" data-action="none"><span class="decision-arrow" id="decision-arrow">↔</span><div><strong id="decision-title">Готов к запуску</strong><small id="decision-subtitle">Агент выберет направление силы</small></div><span class="decision-confidence" id="decision-state-indicator"><i></i> READY</span></div>
+
+          <div class="primary-controls">
+            <button class="button button-run" id="run-button" type="button" disabled><span class="button-play" id="run-icon">▶</span><span id="run-label">Запустить симуляцию</span><kbd>SPACE</kbd></button>
+            <button class="button button-reset" id="reset-small" type="button" aria-label="Сбросить">↻</button>
+          </div>
+
+          <div class="mode-row"><span class="mode-label">РЕЖИМ УПРАВЛЕНИЯ</span><div class="mode-switch" role="group" aria-label="Режим управления"><button class="mode-button is-active" type="button" data-mode="agent"><span class="mode-dot"></span> Агент PPO</button><button class="mode-button" type="button" data-mode="manual">Вручную</button></div></div>
+          <div class="manual-controls" id="manual-controls" hidden><span>Удерживать направление</span><div><button type="button" class="manual-key" id="manual-left" data-action="0" aria-label="Толкать влево">←</button><button type="button" class="manual-key" id="manual-right" data-action="1" aria-label="Толкать вправо">→</button></div></div>
+
+          <div class="state-section-head"><span class="metric-overline">СОСТОЯНИЕ СИСТЕМЫ</span><span class="state-live"><i></i> ОБНОВЛЯЕТСЯ</span></div>
+          <div class="state-grid">
+            <div class="state-metric"><span class="state-symbol">x</span><span class="state-name">Позиция</span><strong id="state-x">0.000 <small>м</small></strong><div class="state-mini-track"><i id="bar-x"></i></div></div>
+            <div class="state-metric"><span class="state-symbol">ẋ</span><span class="state-name">Скорость</span><strong id="state-xdot">0.000 <small>м/с</small></strong><div class="state-mini-track"><i id="bar-xdot"></i></div></div>
+            <div class="state-metric"><span class="state-symbol">θ</span><span class="state-name">Угол шеста</span><strong id="state-theta">0.00 <small>°</small></strong><div class="state-mini-track"><i id="bar-theta"></i></div></div>
+            <div class="state-metric"><span class="state-symbol">θ̇</span><span class="state-name">Угл. скорость</span><strong id="state-thetadot">0.000 <small>рад/с</small></strong><div class="state-mini-track"><i id="bar-thetadot"></i></div></div>
+          </div>
+
+          <div class="recent-head"><span class="metric-overline">ПОСЛЕДНИЕ ДЕЙСТВИЯ</span><button class="quiet-button" id="clear-activity" type="button">Очистить вид</button></div>
+          <div class="activity-list" id="activity-list"><div class="activity-empty"><span class="empty-pulse"></span> Запусти эпизод — здесь появится история решений.</div></div>
+        </section>
+
+        <section class="side-view" id="panel-quality" data-panel="quality" role="tabpanel" hidden>
+          <div class="side-view-heading"><span class="metric-overline">ПРОВЕРКА ПОЛИТИКИ</span><h2>Насколько хорошо<br>работает агент?</h2><p>20 эпизодов с seed 116–135. Сравниваем PPO и случайные действия на одной задаче.</p></div>
+          <button class="button button-wide" id="evaluate-button" type="button" disabled><span>▶</span> Запустить оценку</button>
+          <div class="eval-state"><div class="progress-meta"><span id="evaluation-message">Ожидание оценки</span><b id="eval-progress-text">0 / 20</b></div><div class="episode-segments" id="episode-segments"></div><small id="eval-duration">Каждый сегмент — один эпизод</small></div>
+          <div class="metric-compare"><div class="compare-head"><span>СРЕДНЯЯ НАГРАДА</span><span>ИЗ 500</span></div><div class="compare-row"><div class="compare-label"><span class="compare-dot ppo"></span>PPO</div><strong id="ppo-mean">—</strong><div class="compare-track"><i id="ppo-fill"></i></div><small>σ <b id="ppo-std">—</b> · мин <b id="ppo-min">—</b> · макс <b id="ppo-max">—</b></small></div><div class="compare-row"><div class="compare-label"><span class="compare-dot random"></span>Случайный</div><strong id="random-mean">—</strong><div class="compare-track"><i id="random-fill"></i></div><small>σ <b id="random-std">—</b> · мин <b id="random-min">—</b> · макс <b id="random-max">—</b></small></div></div>
+          <div class="ratio-card"><span class="ratio-symbol">×</span><div><small>ПРЕИМУЩЕСТВО PPO</small><strong id="improvement-text">Запусти оценку, чтобы сравнить агентов.</strong></div></div>
+        </section>
+
+        <section class="side-view" id="panel-training" data-panel="training" role="tabpanel" hidden>
+          <div class="side-view-heading"><span class="metric-overline">ОБУЧЕНИЕ В СИМУЛЯТОРЕ</span><h2>Создай новую<br>версию политики.</h2><p>Кандидат обучается отдельно. Текущая модель продолжает отвечать на запросы.</p></div>
+          <div class="train-status-card"><span class="train-status-icon">∿</span><div><b id="train-status-title">Модель готова</b><small id="train-explanation">На бесплатном сервере обучение отключено. Модель обучена заранее.</small></div></div>
+          <button class="button button-wide" id="train-button" type="button" disabled>Запустить обучение-кандидат <span>↗</span></button>
+          <div class="train-progress-box"><div class="progress-meta"><span id="train-progress-message">Ожидание запуска</span><b id="train-percent">0%</b></div><div class="episode-track"><div class="episode-fill" id="train-progress-fill"></div></div><div class="train-progress-foot"><span id="train-step-count">0 / 0 шагов</span><span id="train-eta">Осталось —</span></div></div>
+          <div class="train-stepper" id="train-stepper"><span data-step="initializing" class="is-current"><i>1</i> Старт</span><span data-step="training"><i>2</i> PPO</span><span data-step="evaluation"><i>3</i> Оценка</span><span data-step="done"><i>✓</i> Готово</span></div>
+          <div class="train-result" id="train-result" hidden></div>
+          <div class="training-note"><span>i</span><p>Для Render Free обучение по умолчанию отключено, чтобы оставить память сервису и анимации. Локально можно включить <code>TRAIN_ENABLED=true</code>.</p></div>
+        </section>
+      </aside>
+    </section>
+
+    <footer class="app-footer"><div><span class="footer-status-dot"></span><span id="footer-message">Система готова. Все шаги выполняются только в симуляторе.</span></div><div class="footer-right"><span>Gymnasium · CartPole-v1</span><span class="footer-separator">/</span><a href="/docs" target="_blank" rel="noreferrer">API Docs ↗</a><span class="footer-separator">/</span><span class="keyboard-hint"><kbd>R</kbd> сброс <kbd>SPACE</kbd> старт</span></div></footer>
+  </main>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
